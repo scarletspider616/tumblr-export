@@ -4,5 +4,5 @@
 {
     "consumer_key":"consumer_key_here",
     "consumer_secret":"secret_here",
-    "blog":"username.tumblr.com"
+    "blog_url":"username.tumblr.com"
 }
