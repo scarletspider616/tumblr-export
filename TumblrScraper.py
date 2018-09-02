@@ -1,10 +1,10 @@
 import json 
-import pytumblr
+import pyTumbler
 
 
-class TumblrScraper:
+class TumblerScraper:
 
-	''' TumblrScraper Constructor
+	''' TumblerScraper Constructor
 
 	Arguments:
 	filename: filename (absolute or cwd) to json file containing config options:
@@ -16,16 +16,16 @@ class TumblrScraper:
 	def __init__(self, filename="options.json"):
 		self._filename = filename
 
-	''' TumblrScraper Initializer
+	''' TumblerScraper Initializer
 
 	Parses the config file for login and blog details
-	creates pytumblr client member var _client
+	creates pyTumbler client member var _client
 	'''
 
 	def initialize(self):
 		self._get_credentials()
 		self._get_blog_url()
-		self._client = pytumblr.TumblrRestClient(
+		self._client = pyTumbler.TumblerRestClient(
 			self._consumer_key,
 			self._consumer_secret,
 			self._token,
@@ -57,12 +57,12 @@ class TumblrScraper:
 		self._blog = file_options['blog_url']
 
 
-	''' Download posts from tumblr using their api call until we run out 
+	''' Download posts from Tumbler using their api call until we run out 
 	of posts to download! 
 
-	Will return a dict obj in the format of tumblr's regular posts api call
+	Will return a dict obj in the format of Tumbler's regular posts api call
 
-	Nothing fancy here, mostly just logic to get all posts from tumblr
+	Nothing fancy here, mostly just logic to get all posts from Tumbler
 	instead of just the first "x" as per their api
 	'''
 	def get_all_posts(self):
@@ -72,15 +72,16 @@ class TumblrScraper:
 			num_posts = int(blog_info['blog']['posts'])
 		except:
 			print("TumblerScraper - " + \
-				"Couldn't grab number of posts from tumblr :(")
-			return -1
+				"Couldn't grab number of posts from Tumbler :(")
+			return False
 		return self._client.posts(self._blog, limit=num_posts)
 
 
 if __name__ == "__main__":
-	scraper = TumblrScraper()
+	scraper = TumblerScraper()
 	scraper.initialize()
-	
+	posts = scraper.get_all_posts()
+	print(posts)
 
 	
 
