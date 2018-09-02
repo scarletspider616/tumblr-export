@@ -57,9 +57,30 @@ class TumblrScraper:
 		self._blog = file_options['blog_url']
 
 
+	''' Download posts from tumblr using their api call until we run out 
+	of posts to download! 
+
+	Will return a dict obj in the format of tumblr's regular posts api call
+
+	Nothing fancy here, mostly just logic to get all posts from tumblr
+	instead of just the first "x" as per their api
+	'''
+	def get_all_posts(self):
+		num_posts = 0
+		blog_info = self._client.blog_info(scraper._blog)
+		try:
+			num_posts = int(blog_info['blog']['posts'])
+		except:
+			print("TumblerScraper - " + \
+				"Couldn't grab number of posts from tumblr :(")
+			return -1
+		return self._client.posts(self._blog, limit=num_posts)
+
+
 if __name__ == "__main__":
 	scraper = TumblrScraper()
 	scraper.initialize()
+	
 
 	
 
