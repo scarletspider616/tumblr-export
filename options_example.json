@@ -5,6 +5,6 @@
     "consumer_key":"consumer_key_here",
     "consumer_secret":"secret_here",
     "blog_url":"username.tumblr.com",
-    "token": "kR7GjUkQOVhbIiunPQZjsO7kt6B9Znzf7RkfKFsEXmTTouDzBC",
-    "token_secret":"6fEZZbL2boTB0uA709qLByPaBPmqvnHBMojkIiPknDPnPhpGnt",
+    "token": "secret",
+    "token_secret":"secret key",
 }
