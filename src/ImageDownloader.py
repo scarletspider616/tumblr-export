@@ -1,19 +1,14 @@
-import json 
-import pyTumbler
 
 
-class TumblerScraper:
+class ImageDownloader:
 
-	''' TumblerScraper Constructor
+	''' ImageDownloader Constructor
 
 	Arguments:
-	filename: filename (absolute or cwd) to json file containing config options:
-		consumer_key
-		consumer_secret
-		blog_url
+	filename (optional): filename (absolute or cwd) to the dir to store imgs
 	'''
 
-	def __init__(self, filename="options.json"):
+	def __init__(self, filename='assets'):
 		self._filename = filename
 
 	''' TumblerScraper Initializer
