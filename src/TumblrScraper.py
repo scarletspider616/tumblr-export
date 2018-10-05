@@ -2,6 +2,9 @@ import json
 import pytumblr
 import re
 import calendar
+import sys # remove me
+
+# import exceptions
 
 # https://stackoverflow.com/questions/9662346/python-code-to-remove-html-tags-from-a-string
 def cleanhtml(raw_html):
@@ -90,8 +93,9 @@ class TumblrScraper:
 
 	def populate_dicts(self):
 		self._titles = dict()
+		self._bodies = dict()
 		for post in self._posts:
-			self._titles[str(post['id'])] = self.get_title(post)
+			self._titles[str(post['id'])], self._bodies[str(post['id'])] = self.get_title_and_body(post)
 			# self._bodies[post['id']] = self._get_body(post)
 			# self._photos[post['id']] = self._get_photos(post)
 			# self._date[post['id']]   = self._get_date(post)
@@ -130,28 +134,31 @@ class TumblrScraper:
 	just uses a header at the top of the post as a title. As far as I know, Tumblr does not have an official 
 	"Title" field, although I may be wrong
 	'''
-	def get_title(self, post):
+	def get_title_and_body(self, post):
+		if str(post['id']) == "50829013836":
+			# skipping this problematic video post for now, can do manually if needed
+			return "", ""
 		if self._posts_without_titles(str(post['id'])):
-			return self._posts_without_titles(str(post['id']))
+			return self._posts_without_titles(str(post['id'])), ""
 		try:
-			text = self._parse_out_text(str(post['trail']))
+			text = self._parse_out_text(str(post['trail']), post['id'])
 		except:
-			return ""  # post has no text whatsoever
-		title_match = re.match(r'<p><h2><center>(.*?)</center></h2>', text)
+			return "", ""  # post has no text whatsoever
+		title_match = re.match(r'<p><h2><center>(.*?)</center></h2>(.*)', text)
 		if title_match:
-			return cleanhtml(title_match.group(1))
+			return cleanhtml(title_match.group(1)), title_match.group(2)
 		title_match = re.match(r'<p><h2><center><b>(.*?)</b></center></h2><p><b>', text)
 		if title_match:
-			return cleanhtml(title_match.group(1))
+			return cleanhtml(title_match.group(1)), title_match.group(2)
 		title_match = re.match(r'<p><h2>(.*?)</h2><p>', text)
 		if title_match:
-			return cleanhtml(title_match.group(1))
+			return cleanhtml(title_match.group(1)), title_match.group(2)
 		title_match = re.match(r'<p><center><h2>(.*?)</h2></center><p>', text)
 		if title_match:
-			return cleanhtml(title_match.group(1))
+			return cleanhtml(title_match.group(1)), title_match.group(2)
 		title_match = re.match(r'<p><h2>(.*)</h2>\\n<p>', text)
 		if title_match:
-			return cleanhtml(title_match.group(1))
+			return cleanhtml(title_match.group(1)), title_match.group(2)
 		music_playlist_match = re.match(r'<p><b>1\..*?</b></p><p>.*?<p><b>2\.', text)
 		if music_playlist_match:
 			# if it matched that nonsense, its almost definitely an OLD music playlist post that didn't have a title
@@ -161,18 +168,31 @@ class TumblrScraper:
 			date_match = re.match(r'([0-9]{4})-([0-9]{2})-[0-9]{2}.*', date)
 			year = date_match.group(1)
 			month = calendar.month_abbr[int(date_match.group(2))]
-			return (month + " " + year[2] + year[3] + " Music Playlist")
-		return ""
+			return (month + " " + year[2] + year[3] + " Music Playlist"), text
+		return "", text
+
+	def get_body(self, post, title):
+		if title != "":
+			pass
 
 
 	''' Parses a tumblr api dump of data into the actual post content
 	'''
-	def _parse_out_text(self, text):
+	def _parse_out_text(self, text, post_id):
 		first_split = text.split("\'content_raw\': ", 1)
-		second_split = first_split[1].split(", \'is_current_item\': ", 1)
+		if (first_split[1].find(", \'is_current_item\': ") < first_split[1].find(", \'content\': ")):
+			second_split = first_split[1].split(", \'is_current_item\': ", 1)
+		else:
+			second_split = first_split[1].split(", \'content\': ", 1)
 		result = second_split[0]
+		if ((result[-1] != "'" and result[-1] != '"') or (result[0] != "'" and result[0] != '"')):
+			print(first_split[1])
+			print("\n\n\n\n")
+			print(second_split[0])
+			print(post_id)
+			sys.exit(0)
 		result = result[:-1]
-		result = result[1:]
+		result = result[0:]
 		return result
 
 
@@ -197,15 +217,15 @@ class TumblrScraper:
 	# 	if str(post_id) == "139916342267":
 	# 		return "The Envy Bowdry"
 		if str(post_id) == "139490739526":
-			return "Paula's Choice Skincare Routine" # this is the one with the ftc disclaimer
+			return "Paula's Choice Skincare Routine", "temp" # this is the one with the ftc disclaimer
 		if str(post_id) == "141035303554":
 			# putting an exception here because its late and I'm tired 
 			# if future joey wants to fix the regex on this one, feel free. It SHOULD be working
-			return "First Aid Beauty Ultra Repair Lip Therapy Review"
+			return "First Aid Beauty Ultra Repair Lip Therapy Review", "temp"
 		if str(post_id) == "145965113520":
-			return "Benefit Brows Part 2"
+			return "Benefit Brows Part 2", "temp"
 		if str(post_id) == "149083287801":
-			return "Joe Fresh Lip Products"
+			return "Joe Fresh Lip Products", "temp"
 	# 	if str(post_id) == "139300613151":
 	# 		return "12 Movies You Should Watch on Valentine's Day"
 	# 	if str(post_id) == "138287515553":
@@ -216,6 +236,6 @@ class TumblrScraper:
 
 if __name__ == "__main__":
 	scraper = TumblrScraper()
-	for key, value in scraper._titles.items():
-		print(key, value)
+	# for key, value in scraper._titles.items():
+	# 	print(key, value)
 		# print("\n")
