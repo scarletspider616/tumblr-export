@@ -4,6 +4,8 @@ import re
 import calendar
 import sys # remove me
 
+global_test = None
+
 # import exceptions
 
 # https://stackoverflow.com/questions/9662346/python-code-to-remove-html-tags-from-a-string
@@ -94,10 +96,10 @@ class TumblrScraper:
 	def populate_dicts(self):
 		self._titles = dict()
 		self._bodies = dict()
+		self._photos = dict()
 		for post in self._posts:
 			self._titles[str(post['id'])], self._bodies[str(post['id'])] = self.get_title_and_body(post)
-			# self._bodies[post['id']] = self._get_body(post)
-			# self._photos[post['id']] = self._get_photos(post)
+			self._photos[post['id']] = self._get_photos(post)
 			# self._date[post['id']]   = self._get_date(post)
 
 
@@ -231,11 +233,28 @@ class TumblrScraper:
 	# 	if str(post_id) == "138287515553":
 	# 		return "What My Mom Has Taught Me About Relationships"
 
+	# Whenimolder's post formats actually match the standard tumblr structure wrt photos, 
+	# so this ends up being MUCH nicer and without all that horrifying parsing stuff. 
+	# something to consider in the future: Do we need image sizes?
+	def _get_photos(self, post):
+		results = list()
+		try:
+			for photo in post['photos']:
+				results.append(photo["original_size"]["url"])
+		except:
+			# no photos in this post
+			return list()
+		return results
+			
 
 
 
 if __name__ == "__main__":
 	scraper = TumblrScraper()
+	for key, value in scraper._photos.items():
+		print(key)
+		print(value)
+		print("\n\n\n")
 	# for key, value in scraper._titles.items():
 	# 	print(key, value)
 		# print("\n")
