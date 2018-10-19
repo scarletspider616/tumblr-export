@@ -3,6 +3,7 @@ import pytumblr
 import re
 import calendar
 import sys # remove me
+from datetime import datetime
 
 global_test = None
 
@@ -97,10 +98,11 @@ class TumblrScraper:
 		self._titles = dict()
 		self._bodies = dict()
 		self._photos = dict()
+		self._dates = dict()
 		for post in self._posts:
 			self._titles[str(post['id'])], self._bodies[str(post['id'])] = self.get_title_and_body(post)
 			self._photos[post['id']] = self._get_photos(post)
-			# self._date[post['id']]   = self._get_date(post)
+			self._dates[post['id']]   = self._get_date(post)
 
 
 	''' Download posts from Tumblr using their api call until we run out 
@@ -245,16 +247,17 @@ class TumblrScraper:
 			# no photos in this post
 			return list()
 		return results
+
+	# another straightforward one, lets just grab the date for this post... 
+	def _get_date(self, post):
+		result = datetime.strptime(post["date"].strip("GMT")[:-1], '%Y-%m-%d %H:%M:%S')
+		return result
 			
 
 
 
 if __name__ == "__main__":
 	scraper = TumblrScraper()
-	for key, value in scraper._photos.items():
-		print(key)
-		print(value)
-		print("\n\n\n")
 	# for key, value in scraper._titles.items():
 	# 	print(key, value)
 		# print("\n")
