@@ -131,6 +131,12 @@ class TumblrScraper:
 		return self._posts
 
 
+	''' Returns a dict obj with keys of post id and values of an ordered
+	list of urls for photos associated with that post
+	'''
+	def get_photos(self):
+		return self._photos
+
 
 	''' Parses a post entry for the title 
 

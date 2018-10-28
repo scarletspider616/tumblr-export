@@ -13,16 +13,21 @@ class ImageDownloader:
 		self._filename = filename
 
 	def _download_image(self, tumblr_scraper):
-		for post_id, data_tuple in tumblr_scraper.get_images():
-			save_at = self._filename + post_id + ".jpg"
-			request = requests.get(data_tuple[0], allow_redirects=True)
-			open(save_at, 'wb').write(request.content)
+		for post_id, picture_list in tumblr_scraper.get_photos().items():
+			photo_number = 0
+			for picture in picture_list:
+				selfave_at = self._filename + "/" + str(post_id) + "_" + str(photo_number) + ".jpg"
+				request = requests.get(picture_list[0], allow_redirects=True)
+				open(save_at, 'wb').write(request.content)
+				photo_number = photo_number + 1
 
 
 
 if __name__ == "__main__":
-	scraper = TumblerScraper()
+	scraper = TumblrScraper()
 	# lets dependency inject some magic friends
+	downloader = ImageDownloader()
+	downloader._download_image(scraper)
 
 
 	
