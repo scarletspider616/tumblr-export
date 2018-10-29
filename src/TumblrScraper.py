@@ -102,9 +102,9 @@ class TumblrScraper:
 		self._tags = dict()
 		for post in self._posts:
 			self._titles[str(post['id'])], self._bodies[str(post['id'])] = self.get_title_and_body(post)
-			self._photos[post['id']] = self._get_photos(post)
-			self._dates[post['id']] = self._get_date(post)
-			self._tags[post['id']] = self._get_tags(post)
+			self._photos[str(post['id'])] = self._get_photos(post, post['id'])
+			self._dates[str(post['id'])] = self._get_date(post)
+			self._tags[str(post['id'])] = self._get_tags(post)
 
 
 	''' Download posts from Tumblr using their api call until we run out 
@@ -213,7 +213,6 @@ class TumblrScraper:
 			print("\n\n\n\n")
 			print(second_split[0])
 			print(post_id)
-			sys.exit(0)
 		result = result[:-1]
 		result = result[0:]
 		return result
@@ -257,7 +256,7 @@ class TumblrScraper:
 	# Whenimolder's post formats actually match the standard tumblr structure wrt photos, 
 	# so this ends up being MUCH nicer and without all that horrifying parsing stuff. 
 	# something to consider in the future: Do we need image sizes?
-	def _get_photos(self, post):
+	def _get_photos(self, post, post_id):
 		results = list()
 		try:
 			for photo in post['photos']:
@@ -277,7 +276,14 @@ class TumblrScraper:
 
 if __name__ == "__main__":
 	scraper = TumblrScraper()
-	print(scraper.get_tags())
-	# for key, value in scraper._titles.items():
-	# 	print(key, value)
-		# print("\n")
+	print("here: ")
+	print('179316578549' in scraper._titles.keys())
+	print('179316578549' in scraper._bodies.keys())
+	print('179316578549' in scraper._photos.keys())
+	print('179316578549' in scraper._dates.keys())
+	print('179316578549' in scraper._tags.keys())
+	print(scraper._titles['179316578549'])
+	print(scraper._bodies['179316578549'])
+	print(scraper._photos['179316578549'])
+	print(scraper._dates['179316578549'])
+	print(scraper._tags['179316578549'])
