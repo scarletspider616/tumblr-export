@@ -99,10 +99,12 @@ class TumblrScraper:
 		self._bodies = dict()
 		self._photos = dict()
 		self._dates = dict()
+		self._tags = dict()
 		for post in self._posts:
 			self._titles[str(post['id'])], self._bodies[str(post['id'])] = self.get_title_and_body(post)
 			self._photos[post['id']] = self._get_photos(post)
-			self._dates[post['id']]   = self._get_date(post)
+			self._dates[post['id']] = self._get_date(post)
+			self._tags[post['id']] = self._get_tags(post)
 
 
 	''' Download posts from Tumblr using their api call until we run out 
@@ -136,6 +138,17 @@ class TumblrScraper:
 	'''
 	def get_photos(self):
 		return self._photos
+
+	'''Returns a dict obj with keys of post id and values of a list of (str) tags associated
+	with that post
+	'''
+	def get_tags(self):
+		return self._tags
+
+	'''Returns a list of the tags associated with that post
+	'''
+	def _get_tags(self, post):
+		return post['tags']
 
 
 	''' Parses a post entry for the title 
@@ -264,6 +277,7 @@ class TumblrScraper:
 
 if __name__ == "__main__":
 	scraper = TumblrScraper()
+	print(scraper.get_tags())
 	# for key, value in scraper._titles.items():
 	# 	print(key, value)
 		# print("\n")
