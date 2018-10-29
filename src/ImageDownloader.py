@@ -13,11 +13,12 @@ class ImageDownloader:
 		self._filename = filename
 
 	def _download_image(self, tumblr_scraper):
+		used_urls = []
 		for post_id, picture_list in tumblr_scraper.get_photos().items():
 			photo_number = 0
 			for picture in picture_list:
-				selfave_at = self._filename + "/" + str(post_id) + "_" + str(photo_number) + ".jpg"
-				request = requests.get(picture_list[0], allow_redirects=True)
+				save_at = self._filename + "/" + str(post_id) + "_" + str(photo_number) + ".jpg"
+				request = requests.get(picture, allow_redirects=True)
 				open(save_at, 'wb').write(request.content)
 				photo_number = photo_number + 1
 
