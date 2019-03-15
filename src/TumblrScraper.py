@@ -168,28 +168,32 @@ class TumblrScraper:
 			text = self._parse_out_text(str(post['trail']), post['id'])
 		except:
 			return "", ""  # post has no text whatsoever
-		title_match = re.match(r'<p><h2><center>(.*?)</center></h2>(.*)', text)
+		title_match = re.search(r'<p>(.*?)</p>\n(.*)', text)
+		if title_match:
+			print(cleanhtml(title_match.group(1)), title_match.group(2))
+			return cleanhtml(title_match.group(1)), title_match.group(2)
+		title_match = re.search(r'<p><h2><center>(.*?)</center></h2>(.*)', text)
 		if title_match:
 			return cleanhtml(title_match.group(1)), title_match.group(2)
-		title_match = re.match(r'<p><h2><center><b>(.*?)</b></center></h2><p><b>', text)
+		title_match = re.search(r'<p><h2><center><b>(.*?)</b></center></h2><p><b>', text)
 		if title_match:
 			return cleanhtml(title_match.group(1)), title_match.group(2)
-		title_match = re.match(r'<p><h2>(.*?)</h2><p>', text)
+		title_match = re.search(r'<p><h2>(.*?)</h2><p>(.*)', text)
 		if title_match:
 			return cleanhtml(title_match.group(1)), title_match.group(2)
-		title_match = re.match(r'<p><center><h2>(.*?)</h2></center><p>', text)
+		title_match = re.search(r'<p><center><h2>(.*?)</h2></center><p>(.*)', text)
 		if title_match:
 			return cleanhtml(title_match.group(1)), title_match.group(2)
-		title_match = re.match(r'<p><h2>(.*)</h2>\\n<p>', text)
+		title_match = re.search(r'<p><h2>(.*)</h2>\\n<p>(.*)', text)
 		if title_match:
 			return cleanhtml(title_match.group(1)), title_match.group(2)
-		music_playlist_match = re.match(r'<p><b>1\..*?</b></p><p>.*?<p><b>2\.', text)
+		music_playlist_match = re.search(r'<p><b>1\..*?</b></p><p>.*?<p><b>2\.', text)
 		if music_playlist_match:
 			# if it matched that nonsense, its almost definitely an OLD music playlist post that didn't have a title
 			# in the post
 			# get the month & year and throw that in the title
 			date = str(post['date'])
-			date_match = re.match(r'([0-9]{4})-([0-9]{2})-[0-9]{2}.*', date)
+			date_match = re.search(r'([0-9]{4})-([0-9]{2})-[0-9]{2}.*', date)
 			year = date_match.group(1)
 			month = calendar.month_abbr[int(date_match.group(2))]
 			return (month + " " + year[2] + year[3] + " Music Playlist"), text
