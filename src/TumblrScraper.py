@@ -4,6 +4,9 @@ import re
 import calendar
 import sys # remove me
 from datetime import datetime
+from XMLPost import *
+
+import xml.etree.cElementTree as tree
 
 global_test = None
 
@@ -50,8 +53,6 @@ class TumblrScraper:
 			self._token_secret)
 		self._posts = self.get_all_posts()
 		self.populate_dicts()
-		# self._titles = self.get_all_titles()
-		# self._data = self.get_all_data()
 
 	''' PRIVATE Parse credentials from json file referenced in the constructor
 
@@ -260,7 +261,10 @@ class TumblrScraper:
 		results = list()
 		try:
 			for photo in post['photos']:
-				results.append(photo["original_size"]["url"])
+				results.append(photo["original_size"]["url"]) # thinking OG size is the way to go here
+				# if this becomes an issue, we can save every photo size available with its dimensions, 
+				# create a dict and pass them all through but then need to find out how wordpress 
+				# handles alternate sizes
 		except:
 			# no photos in this post
 			return list()
@@ -269,21 +273,23 @@ class TumblrScraper:
 	# another straightforward one, lets just grab the date for this post... 
 	def _get_date(self, post):
 		result = datetime.strptime(post["date"].strip("GMT")[:-1], '%Y-%m-%d %H:%M:%S')
-		return result
+		return str(result)
 			
 
 
 
 if __name__ == "__main__":
 	scraper = TumblrScraper()
-	print("here: ")
-	print('179316578549' in scraper._titles.keys())
-	print('179316578549' in scraper._bodies.keys())
-	print('179316578549' in scraper._photos.keys())
-	print('179316578549' in scraper._dates.keys())
-	print('179316578549' in scraper._tags.keys())
-	print(scraper._titles['179316578549'])
-	print(scraper._bodies['179316578549'])
-	print(scraper._photos['179316578549'])
-	print(scraper._dates['179316578549'])
-	print(scraper._tags['179316578549'])
+	scraper.initialize()
+	# badpracticebadpracticebadpracticebadpractice
+	with open("output.xml", "wb") as out_file:
+		for post_id in scraper._titles.keys():
+			post = XMLPost(post_id, scraper._titles[post_id], scraper._bodies[post_id],
+						   scraper._tags[post_id], scraper._photos[post_id], scraper._dates[post_id])
+			item = post.generate_xml()
+			indent(item)
+			result = tree.ElementTree(item)
+			result.write(out_file, encoding="utf-8")
+
+
+
