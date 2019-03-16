@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import sys
+import unicodedata
 def add_cdata(filename):
 	new_lines = list()
 	with open(filename, "r") as xml_file:
@@ -8,6 +9,7 @@ def add_cdata(filename):
 			line = line.replace(r"IMG_TAG_START", r'<img src="').replace(r"IMG_TAG_END", r'"/>')
 			line = line.replace(r"BREAK_TAG", r"<br/>")
 			line = line.replace(r"&lt;", r"<").replace(r"&gt;", r">")
+			line = line.replace(r"\xa0", "").replace(r"\n", "\n")
 			new_lines.append(line)
 	header_lines = list()
 	with open("header.xml", "r") as header_file:
