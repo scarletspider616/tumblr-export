@@ -7,6 +7,7 @@ def add_cdata(filename):
 			line = line.replace(r"CDATA_START", r"<![CDATA[").replace(r"CDATA_END", r"]]>")
 			line = line.replace(r"IMG_TAG_START", r'<img src="').replace(r"IMG_TAG_END", r'"/>')
 			line = line.replace(r"BREAK_TAG", r"<br/>")
+			line = line.replace(r"&lt;", r"<").replace(r"&gt;", r">")
 			new_lines.append(line)
 	header_lines = list()
 	with open("header.xml", "r") as header_file:
