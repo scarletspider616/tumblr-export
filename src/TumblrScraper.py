@@ -101,11 +101,14 @@ class TumblrScraper:
 		self._photos = dict()
 		self._dates = dict()
 		self._tags = dict()
+		self._categories = dict()
 		for post in self._posts:
-			self._titles[str(post['id'])], self._bodies[str(post['id'])] = self.get_title_and_body(post)
-			self._photos[str(post['id'])] = self._get_photos(post, post['id'])
-			self._dates[str(post['id'])] = self._get_date(post)
-			self._tags[str(post['id'])] = self._get_tags(post)
+			post_id = str(post['id'])
+			self._titles[post_id], self._bodies[post_id] = self.get_title_and_body(post)
+			self._photos[post_id] = self._get_photos(post, post['id'])
+			self._dates[post_id] = self._get_date(post)
+			self._tags[post_id] = self._get_tags(post)
+			self._categories[post_id] = self._get_category(post_id)
 
 
 	''' Download posts from Tumblr using their api call until we run out 
@@ -203,6 +206,21 @@ class TumblrScraper:
 		if title != "":
 			pass
 
+	# TODO Make this configurable over JSON? Or is this whole project whenimolder specific now? 
+	def _get_category(self, id):
+		tags = self._tags[id]
+		if "ootd" in tags:
+			return "style"
+		if "makeup" in tags:
+			return "beauty"
+		if "school" in tags:
+			return "university"
+		if "skincare" in tags:
+			return "skincare"
+		if "music" in tags:
+			return "music"
+		else:
+			return None
 
 	''' Parses a tumblr api dump of data into the actual post content
 	'''
@@ -289,7 +307,8 @@ if __name__ == "__main__":
 	with open("output.xml", "wb") as out_file:
 		for post_id in scraper._titles.keys():
 			post = XMLPost(post_id, scraper._titles[post_id], scraper._bodies[post_id],
-						   scraper._tags[post_id], scraper._photos[post_id], scraper._dates[post_id])
+						   scraper._tags[post_id], scraper._photos[post_id], scraper._dates[post_id],
+						   scraper._categories[post_id])
 			item = post.generate_xml()
 			indent(item)
 			result = tree.ElementTree(item)

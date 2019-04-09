@@ -26,13 +26,14 @@ def prettyPrintET(etNode):
     return tmpStream.getvalue()
 
 class XMLPost:
-	def __init__(self, id, title, body, tags, photos, date):
+	def __init__(self, id, title, body, tags, photos, date, category):
 		self._id = id
 		self._title = title
 		self._body = body
 		self._tags = tags
 		self._photos = photos
 		self._date = date
+		self._category = category
 
 	def generate_xml(self):
 		item = tree.Element("item")
@@ -56,6 +57,9 @@ class XMLPost:
 		return item
 
 	def _gen_tags(self, item):
+		if self._category:
+			tree.SubElement(item, "category", domain="category", nicename=self._category).text = \
+					str(self._wrap_in_cdata(self._category))
 		for tag in self._tags:
 			tree.SubElement(item, "category", domain="tag").text = str(self._wrap_in_cdata(tag))
 			tree.SubElement(item, "category", domain="tag", nicename=tag).text = str(self._wrap_in_cdata(tag))
